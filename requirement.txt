@@ -1,0 +1,13 @@
+# install mysql, check port, user, password [](https://www.tecmint.com/fix-error-2003-hy000-cant-connect-to-mysql-server-on-127-0-0-1-111/)
+# create database django_project [](https://linuxize.com/post/how-to-create-a-mysql-database/)
+
+numpy
+tensorflow
+django==1.11.9
+opencv-python==3.4.0.12
+scikit-learn==0.19.1
+scipy
+Pillow
+matplotlib
+# sudo apt-get install python-tk
+# 

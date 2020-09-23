@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "attendancelhp-289508",
+  "private_key_id": "b25ab853fc73214a7fa0784368d3c5890eae6555",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC9UkSTtFjL2WNC\n1+kd1YIGYInyjDk3bhtqQKFeZzWBEwUW0uiVZDtsFSntlLDyanIZVozhSQxxFhR2\npub8QQoim6tj2M122vBISF8Bky9Ambb1HD7Br7dFQ6OoLFJLTO2JmhpuZR9umrhA\nXxctQ3dn8I+pp9qp8q0+Rb+faZ/YPqzBqHrD3i47NHVR40Vic4F/3mSG6l/b24JZ\nv5/KNnHwolEB1JvdRCy5NLMNC2SXaXWsciXToA4Ljoss/gbx59XEZxrErIE+kqVd\nGTg+/7t/voXdxUlUst3WyIMUDCNS3edudqAc8cN8mHWM4Ql9+Pje0X/7nBz3CNWT\nyjJzailzAgMBAAECggEAK3na+bhus9FmNBF1HT7Mrz44L5T4BryoWwwggpdc+Bkw\nD/+7HaN46ecqS77bq6+6KAtyKsIls0qIxH6riL4+35e0EifVdzfr+g10k94C+ejS\n1RL5bm01vxg7WwFinJw76F+VNkjOoQ2yxkWQAvr9Tsc1lpZPZruuASDvUmJlLLlB\n5n5n0Kqj+L4nL1g8psU073UfwE1XVh3CdCRe2MojwbahGKEU0vw/hoRPC40CZ953\n/X7ZHjzI/mOPy0lwJyVrTycH38kFCyGRsVezu89vlcADMr9XdRE0GvdQCl/QZcoZ\nCbs/GBNaXHsxcd6sNP9+jQjrQlqJMht0yLs7BI3QsQKBgQD6wH7TmhvfRMPDQw1D\nSychVNvgwe+MCXTk0loASxLPFepRu6mQwiuaZBWQLRoD/e2sc2jrG8J/JMDEatnB\nHt/SN0ub8WPA/zoWLTJWZy+11bKMoEz3SRwsOT2qwjQ2c2uTBxGFYE6pELR0FT0y\nxth388daGAhSw9XqTBidBm26JwKBgQDBSKIldf1smsEesTBdfEWcVoUy4TtV2vSJ\nbL7OdVvT6eKTi6r3tp3ryrs6JZSse6rN0Ou5QQBfqXTYXcMNpcIPpw8PiEFJWF/K\no3GhlnC+GaOVlTK/CcY71eOnZ4RB082ovgE97M0/GQaSPPQf3SHfPxPw1ItCLWeI\nYYO6pa7h1QKBgBIxc0JBFTKe16FMNSMjycQGVym4iHvdl8ieZn9M8yFpUqX5erUR\nEX7TMilSzGdrvhncCcm9KuB0tzPJGOGFLvIepvK6keVH31wKjXNtay3DQoAnhU4P\n1OZ0hL/l9UnaF/0D70aBFVP47U7a16Tefog9fMJRqhDvOo8UVFjYRY/TAoGAUhnG\nNl9eHInHyn+9aZhmATiHL8uYZqmxAcbdbdlP/j307nN/VeWOQyBEUzivZGzLas15\ns6E2xWu3pEh/mAZ23is6LIDWKo+NcQfoNpkunrFJWTqc6aT/PV9nai6AcW3EiA7d\nfC5gKJM6xVd64yYNQ0UJ9VxzItMijT3OtLO4C1kCgYEAriUXiQZmmIBBIKne5XlE\nkhW3F47jxWwqlyMLZUmdlY20f61GwqTbUQhCq9d1JHD8amKtGIDB1RVY/yPhvMKw\n14qTVzv5lzo4/U8wvD27OCdRiH0UIqspa1Hs8OG9tdrTBDSXWLgmW4yWgstr78hy\nBSsa08DLPNwEmt2Tnzg34fg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "vanlongcotai@attendancelhp-289508.iam.gserviceaccount.com",
+  "client_id": "102344646374430566353",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vanlongcotai%40attendancelhp-289508.iam.gserviceaccount.com"
+}
