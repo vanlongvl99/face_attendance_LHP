@@ -20,10 +20,10 @@ from mtcnn.mtcnn import MTCNN
 
 
 
-num_of_images = 50
 path_raw_image = "./dataset1/raw"
 path_face_image = "./dataset1/only_face"
 path_file_json = 'index_to_name_test.json'
+
 
 try:
     f = f = open(path_file_json,)
@@ -98,8 +98,8 @@ def TakeImages():
     videoWriter = cv2.VideoWriter( path_raw_image+ "/" + str(index_name) + "/" + str(index_name) + "_video.avi", fourcc, 30.0, (640,480))
     
     # cam = cv2.VideoCapture("http://192.168.43.1:8080/video")
-    cam = cv2.VideoCapture(0)
-    # cam = cv2.VideoCapture(2)
+    # cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(2)
     count = 0
     while True:
         ret, frame = cam.read()
