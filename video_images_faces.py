@@ -24,6 +24,10 @@ path_raw_image = "./dataset1/raw"
 path_face_image = "./dataset1/only_face"
 path_file_json = 'index_to_name_test.json'
 
+try:
+    os.mkdir("dataset1")
+except:
+    pass
 
 try:
     f = f = open(path_file_json,)
