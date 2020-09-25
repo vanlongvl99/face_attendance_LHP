@@ -35,8 +35,8 @@ try:
 except:
     index_to_name = {}
 list_name = []
-for index, name_and_class in index_to_name.items():
-    list_name.append(name_and_class["name"])
+for index, name_and_number in index_to_name.items():
+    list_name.append(name_and_number["name"])
 
 
 
@@ -61,7 +61,7 @@ bg ="white", fg ="green",
 font = ('times', 15, ' bold '))
 txt2.place(x = 700, y = 215)
 
-lbl3 = tk.Label(window, text ="Class of new person",
+lbl3 = tk.Label(window, text ="Number of new person",
 width = 20, fg ="green", bg ="white",
 height = 2, font =('times', 15, ' bold '))
 lbl3.place(x = 400, y = 250)
@@ -80,9 +80,9 @@ txt3.place(x = 700, y = 265)
 def TakeImages():
 
     name =(txt2.get())
-    class_std = txt3.get()
+    number_std = txt3.get()
     if name not in list_name:
-        index_to_name[len(list_name)] = {"name":name,"class":class_std}
+        index_to_name[str(len(list_name))] = {"name":name,"number":number_std}
         list_name.append(name)
     fourcc = cv2.VideoWriter_fourcc('X','V','I','D')
     index_name = len(list_name) - 1
@@ -101,7 +101,7 @@ def TakeImages():
     fourcc = cv2.VideoWriter_fourcc('X','V','I','D')
     videoWriter = cv2.VideoWriter( path_raw_image+ "/" + str(index_name) + "/" + str(index_name) + "_video.avi", fourcc, 30.0, (640,480))
     
-    # cam = cv2.VideoCapture("http://192.168.43.1:8080/video")
+    # cam = cv2.VideoCapture("http://192.168.2.26:8080/video")
     # cam = cv2.VideoCapture(0)
     cam = cv2.VideoCapture(2)
     count = 0
@@ -111,7 +111,7 @@ def TakeImages():
         cv2.imshow('frame_resize', frame)
         videoWriter.write(frame)
         key = cv2.waitKey(20)
-        if count % 5 == 0:
+        if count % 5 == 0 and count //5 < 100:
             cv2.imwrite(path_raw_image + "/" + str(index_name) + "/images/" + str(index_name) +"__" + str(count//5) + ".jpg", frame)
             print(path_raw_image + "/" + str(index_name) + "/images/" + str(index_name) +"__" + str(count//5) + ".jpg")
         count += 1
@@ -138,17 +138,21 @@ def take_face_from_image():
     for index_name in listdir(path_raw_image):
         try:
             os.mkdir(path_face_image + "/" + index_name)
+            for file_name in listdir(path_raw_image + "/" + index_name + "/images"):
+                start_time = datetime.now()
+                image = cv2.imread(path_raw_image + "/" + index_name + "/images" + "/" + file_name)
+                faces = detector.detect_faces(image)
+                print("mtcnn:", datetime.now()- start_time)
+                if len(faces) == 1:
+                    for person in faces:
+                        bounding_box = person['box']
+                        im_crop = image[bounding_box[1] : bounding_box[1] + bounding_box[3], bounding_box[0]: bounding_box[0]+bounding_box[2] ]
+                        if im_crop.shape[0] > 0 and im_crop.shape[1] > 0:
+                            cv2.imwrite(path_face_image + "/" + index_name + "/" + file_name, im_crop)
         except:
             pass
-        for file_name in listdir(path_raw_image + "/" + index_name + "/images"):
-            image = cv2.imread(path_raw_image + "/" + index_name + "/images" + "/" + file_name)
-            faces = detector.detect_faces(image)
-            if len(faces) == 1:
-                for person in faces:
-                    bounding_box = person['box']
-                    im_crop = image[bounding_box[1] : bounding_box[1] + bounding_box[3], bounding_box[0]: bounding_box[0]+bounding_box[2] ]
-                    if im_crop.shape[0] > 0 and im_crop.shape[1] > 0:
-                        cv2.imwrite(path_face_image + "/" + index_name + "/" + file_name, im_crop)
+        
+        
         print("finished:",index_name)
     print("finished")
     messagebox.showinfo(title="Thông báo", message="Hoàn tất take face!")
