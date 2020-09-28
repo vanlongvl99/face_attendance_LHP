@@ -31,6 +31,13 @@ Click `Quit` để thoát khỏi chương trình thu thập dữ liệu.
 
 # Chương trình điểm danh
 
+- Source code Nhận diện nằm trong file  `/facial_recog/faceRecog/views.py` ở hàm `detect`:
+
+- Vì file model nặng nên không thể upload lên github, các bạn tải file mode [tại đây](https://drive.google.com/drive/folders/1sxYaEGKeChUC4NlozsdAQZT09vQYId8f?usp=sharing). Sau khi download các file model về, ta lưu các file model trong thư mục `./facial_recog/ml/model_file`. Lưu ý không chỉnh sửa tên các file model, nếu không sẽ bị 1 số lỗi gọi tên file khi chạy chương trình.
+
+
 Run 
 
 `python3 manage.py runserver`
+
+
