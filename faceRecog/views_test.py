@@ -7,7 +7,7 @@ from . import dataset_fetch as df
 from . import cascade as casc
 from PIL import Image
 from numpy import expand_dims
-import time
+from time import time
 from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
@@ -32,60 +32,21 @@ import datetime
 import json
 
 
+detector = MTCNN()
+
 
 # set PATH
-path_dataset = BASE_DIR + "/dataset1"
 path_model_facenet = BASE_DIR +  '/ml/model_file/facenet_keras.h5'
 path_weights_facenet = BASE_DIR +  '/ml/model_file/facenet_keras_weights.h5'
-path_of_data_only_face = path_dataset + "/only_face'
+path_of_data = BASE_DIR+'/dataset1/only_face/'
 path_file_json = BASE_DIR + '/index_to_name_test.json'
-path_data_demo = BASE_DIR + "/dataset_demo_to_back_up"
-name_file_image_demo = path_data_demo + "/" +  "/name_file_image_demo.json"
-filename_svm_model = BASE_DIR + "/ml/model_file/svm_model.sav"
-path_dict_attendance_today = BASE_DIR + "/dict_attendance_today.json"
-
-
-
-# dict_attendance
-
-try:
-    os.mkdir(path_dataset)
-except:
-    print("dataset1 created")
-
-try:
-    f = open(name_file_image_demo,)
-    dict_name_file_image_demo = json.load(f) 
-except:
-    dict_name_file_image_demo = {}
-
-try:
-    os.mkdir(path_data_demo)
-except:
-    print("path data demo created ")
-
-
 f = open(path_file_json,)
 index_to_label = json.load(f) 
 
 
-# CREATE DICT STUDENT EMPTY TO ATTENDANCE
-try:
-    f = open(path_dict_attendance_today,)
-    dict_attendance_today = json.load(f)
-except:
-    dict_attendance_today = {}
-    for index_name, name_and_number in index_to_label.items():
-        dict_attendance_today[name_and_number["name"]] = ""
-        try:
-            os.mkdir(path_data_demo + "/" + index_name)
-        except:
-            print("forder %s already created" %index_name)
-
-
-detector = MTCNN()
 
 # Load model facenet
+mode_facenet = ""
 model_facenet = load_model(path_model_facenet)
 model_facenet.load_weights(path_weights_facenet )
 
@@ -100,14 +61,12 @@ def create_dataset(request):
     userId = request.POST['userId']
     # Detect face
     # takes video capture id, for webcam most of the time its 0.
-    # cam = cv2.VideoCapture(0)
-    cam = cv2.VideoCapture(2) 
-
+    cam = cv2.VideoCapture(0)
     user_name = userId
     # Our dataset naming counter
     sampleNum = 0
     try:
-        os.mkdir(path_of_data_only_face + "/" + user_name)
+        os.mkdir(path_of_data + user_name)
     except:
         pass
     # Capturing the faces one by one and detect the faces and showing it on the window
@@ -128,7 +87,7 @@ def create_dataset(request):
             if im_crop.shape[0] > 0 and im_crop.shape[1] > 0:
                 cv2.rectangle(img,(bounding_box[0],bounding_box[1]),(bounding_box[0] + bounding_box[2],bounding_box[1] + bounding_box[3]),(0,155,255),3)
                 count += 1
-                cv2.imwrite(path_of_data_only_face + "/" + user_name + "/" + user_name + str(count) + ".jpg", im_crop)
+                cv2.imwrite(path_of_data + user_name + "/" + user_name + str(count) + ".jpg", im_crop)
             
         cv2.imshow('frame', img)
         if cv2.waitKey(100) & 0xFF == ord('q'):
@@ -164,7 +123,7 @@ def load_data(path):
             path_of_image = path + '/' + index_name + '/' + file_name
             image = cv2.imread(path_of_image)
             count += 1
-            if count == 70:
+            if count == 100:
                 break
             image = cv2.resize(image,(160,160))
             X_train.append(image)
@@ -187,10 +146,8 @@ def trainer(request):
     import os
     from PIL import Image
     from sklearn.svm import SVC
-    print("start train")
-    start_time = datetime.datetime.now()
     #Path of the samples
-    X_train, y_labels_train, index_to_label = load_data(path_of_data_only_face)
+    X_train, y_labels_train, index_to_label = load_data(path_of_data)
     # convert each face in the train set to an embedding
     newX_train = list()
     for face_pixels in X_train:
@@ -205,123 +162,82 @@ def trainer(request):
     model_svm.fit(newX_train, y_labels_train)
     # predict
     yhat_train = model_svm.predict(newX_train)
-    print( "time train: ",datetime.datetime.now() - start_time,"finished")
+    print(datetime.datetime.now(), "finished")
     #save model svm
-    # filename_svm_model = BASE_DIR + "/ml/model_file/svm_model.sav"
+    filename_svm_model = BASE_DIR + "/ml/model_file/svm_model.sav"
     joblib.dump(model_svm, filename_svm_model)
 
     return redirect('/')
 
 
 
-def detect(request):
-# def detect_mtcnn(request):
-
-
-    # LOAD MODEL SVM TO PREDICTION
-    # filename_svm_model = BASE_DIR + "/ml/model_file/svm_model.sav"
+# def detect(request)
+def detect_mtcnn(request):
+    #connect with google sheet
+    scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/spreadsheets',"https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("attendancelhp.json", scope)
+    client = gspread.authorize(creds)
+    # set position of this week
+    # index_row = 7
+    today = str(datetime.date.today())
+    sheet = client.open("test_attendance").sheet1  # Open the spreadhseet
+    col2_values = sheet.col_values(2)  # Get a specific column
+    row1_values = sheet.row_values(1)
+    # print("col2_values", col2_values)
+    # print("row1_values", row1_values)
+    index_row = len(row1_values)
+    if row1_values[len(row1_values)-1] != today:
+        sheet.update_cell(1, len(row1_values) + 1,today)
+        index_row += 1
+    filename_svm_model = BASE_DIR + "/ml/model_file/svm_model.sav"
     loaded_model_SVM = joblib.load(filename_svm_model)
-    # SET UP CAMERA
-    # cam = cv2.VideoCapture(0)
-    cam = cv2.VideoCapture(2)
-    count = len(dict_name_file_image_demo)
-
+    cam = cv2.VideoCapture(0)
     print(index_to_label)
     print("detect")
     while(True):
-        start_time = datetime.datetime.now()
         ret, img = cam.read()
-        # DETECT FACE
         faces = detector.detect_faces(img)
         for person in faces:
             bounding_box = person["box"]
             im_crop = img[bounding_box[1]: bounding_box[1] + bounding_box[3], bounding_box[0]: bounding_box[0]+bounding_box[2] ]
             if im_crop.shape[0] > 0 and im_crop.shape[1] > 0:
-                # GET EMBEDDING FROM FACE
                 im_embedding = get_embedding(model_facenet, im_crop)
                 im_embedding = expand_dims(im_embedding,axis = 0)
-                # GET PREDICTION BY SVM
                 pre_face = loaded_model_SVM.predict_proba(im_embedding)[0]
-                print("\n mtcnn pre 1 person:",datetime.datetime.now() - start_time)
-                print("prediction:",pre_face)
-                try:
-                    for i in range(len(index_to_label)):
-                        name_and_class = index_to_label[str(i)]
-                        print(name_and_class["name"] + ':','{0:0.2f}'.format(pre_face[i]))
-                except:
-                    print("error loop index_to_label")
+                print(datetime.datetime.now(), "end")
+                for i in range(len(index_to_label)):
+                    name_and_class = index_to_label[str(i)]
+                    print(name_and_class["name"] + ':','{0:0.2f}'.format(pre_face[i]))
                 max_index = np.argmax(pre_face)
+
                 # print(index_to_label[max_index],pre_face[max_index], "end\n")
                 cv2.rectangle(img,(bounding_box[0], bounding_box[1]),(bounding_box[0]+bounding_box[2], bounding_box[1] + bounding_box[3]),(0,155,255),2)
-                # CHECK THRESHOLD
-                if pre_face[max_index] > 0.65:
-                    # print("max index:",max_index)
+                if pre_face[max_index] > 0.75:
+                    print("max index:",max_index)
                     name_and_class = index_to_label[str(max_index)]
                     cv2.putText(img, name_and_class["name"] + ': ' + str('{0:0.2f}'.format(pre_face[max_index])), (bounding_box[0], bounding_box[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (30, 255, 30), 2, cv2.LINE_AA)
-                    cv2.imwrite(path_data_demo + "/" + str(max_index) + "/" + str(count) + ".jpg", img )
-                    dict_name_file_image_demo[path_data_demo + "/" + str(max_index) + "/" + str(count) + ".jpg"] = str(pre_face)
-                    count += 1
-                    # CHECK ATTENDANCE YET
-                    now = datetime.datetime.now()
-                    time_true = datetime.datetime(now.year,now.month,now.day,now.hour + 7, now.minute,now.second)
-                    try:
-                        if len(dict_attendance_today[name_and_class["name"]]) == 0:
-                            dict_attendance_today[name_and_class["name"]] = str(time_true)
-                    except:
-                        dict_attendance_today[name_and_class["name"]] = str(time_true)
+                    if name_and_class["name"] not in col2_values:
+                        sheet.update_cell(len(col2_values) + 1, 2, name_and_class["name"])
+                        sheet.update_cell(len(col2_values) + 1, 3, name_and_class["class"])
+                        col2_values.append(name_and_class["name"])
+                    index_col = col2_values.index(name_and_class["name"]) + 1
+                    # row_check_values = sheet.row_values(index_col)
+                    if len(sheet.row_values(index_col)) < len(sheet.row_values(1)):
+                        now = datetime.datetime.now()
+                        time_true = datetime.datetime(now.year,now.month,now.day,now.hour + 7, now.minute,now.second)
+                        sheet.update_cell(index_col, index_row, str(time_true))
 
-            # SAVE DICT ATTENDANCE AS JSON FILE
-            with open(path_dict_attendance_today, 'w') as json_file:
-                json.dump(dict_attendance_today, json_file)
-            # print(dict_name_file_image_demo)
-            with open(name_file_image_demo, 'w') as json_file:
-                json.dump(dict_name_file_image_demo, json_file) 
         cv2.imshow('image',img)
-        print("end 1 image:", datetime.datetime.now() - start_time)
         if cv2.waitKey(100) & 0xFF == ord('q'):
             break
     cam.release()
     cv2.destroyAllWindows()
-
-    # CONNECT TO GOOGLE SHEET
-    scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/spreadsheets',"https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("attendancelhp.json", scope)
-    client = gspread.authorize(creds)
-    sheet = client.open("test_attendance").sheet1  # Open the spreadhseet
-
-    # UPDATE GOOGLE SHEET
-    today = str(datetime.date.today())
-    col2_values = sheet.col_values(2)  # Get a specific column
-    row1_values = sheet.row_values(1)
-    # print("col2_values", col2_values)
-    # print("row1_values", row1_values)
-    len_row1 = len(row1_values)
-    # CREATE NEW DATE IN GOOGLE SHEET
-    if row1_values[-1] != today:
-        sheet.update_cell(1, len(row1_values) + 1,today)
-        len_row1 += 1
-    # FILL GOOGLE SHEET ATTENDANCE
-    print("FILL GOOGLE SHEET ATTENDANCE")
-    for name_student, time_attendance in dict_attendance_today.items():
-        if name_student not in col2_values:
-            sheet.update_cell(len(col2_values) + 1, 2, name_student)
-            col2_values.append(name_student)
-        index_col = col2_values.index(name_student) + 1
-        row_student_values = sheet.row_values(index_col)
-        if len(row_student_values) < len_row1: 
-            sheet.update_cell(index_col, len_row1, time_attendance)
-            print("update",name_student,time_attendance)
-        else:
-            print("not update:",name_student)
-
-    print(dict_attendance_today)
-
     return redirect('/')
 
 
 
-# def detect(request):
-def detect_haar(request):
+def detect(request):
+# def detect_haar(request)
     #connect with google sheet
 
     scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/spreadsheets',"https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive"]

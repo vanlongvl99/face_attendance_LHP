@@ -98,16 +98,17 @@ def TakeImages():
         print("make:",path_raw_image + "/" + str(index_name) + "/images")
     except:
         pass
-    fourcc = cv2.VideoWriter_fourcc('X','V','I','D')
-    videoWriter = cv2.VideoWriter( path_raw_image+ "/" + str(index_name) + "/" + str(index_name) + "_video.avi", fourcc, 30.0, (640,480))
-    
     # cam = cv2.VideoCapture("http://192.168.2.26:8080/video")
     # cam = cv2.VideoCapture(0)
     cam = cv2.VideoCapture(2)
+    fourcc = cv2.VideoWriter_fourcc('X','V','I','D')
+    videoWriter = cv2.VideoWriter( path_raw_image+ "/" + str(index_name) + "/" + str(index_name) + "_video.avi", fourcc, 30.0, (640,480))
+    
+
     count = 0
     while True:
         ret, frame = cam.read()
-        frame = cv2.resize(frame,(640,int(frame.shape[0]/frame.shape[1]*640)))
+        # frame = cv2.resize(frame,(720,int(frame.shape[0]/frame.shape[1]*720)))
         cv2.imshow('frame_resize', frame)
         videoWriter.write(frame)
         key = cv2.waitKey(20)
